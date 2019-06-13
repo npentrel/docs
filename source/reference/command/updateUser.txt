@@ -78,14 +78,6 @@ user info:
       "userId" : BinData(4,"0WA7vBIQTC6S/ZsDwxyXVw=="), // Starting in MongoDB 3.4.22
       "user" : "appClient01",
       "db" : "products",
-      "credentials" : {
-            "SCRAM-SHA-1" : {
-               "iterationCount" : 10000,
-               "salt" : "vXYL9Q3NnfZjLHCOej0NLQ==",
-               "storedKey" : "Bw0MXnC1hEBbM3lDebatMRZSokQ=",
-               "serverKey" : "tzvPqiB7ynqji5kmrCiAkUrke+Q="
-            }
-         },
       "customData" : { "empID" : "12345", "badge" : "9156" },
       "roles" : [
           { "role" : "readWrite",
@@ -119,14 +111,6 @@ user information:
       "userId" : BinData(4,"0WA7vBIQTC6S/ZsDwxyXVw=="), // Starting in MongoDB 3.4.22
       "user" : "appClient01",
       "db" : "products",
-      "credentials" : {
-         "SCRAM-SHA-1" : {
-            "iterationCount" : 10000,
-            "salt" : "vXYL9Q3NnfZjLHCOej0NLQ==",
-            "storedKey" : "Bw0MXnC1hEBbM3lDebatMRZSokQ=",
-            "serverKey" : "tzvPqiB7ynqji5kmrCiAkUrke+Q="
-         }
-      },
       "roles" : [
           { "role" : "read",
             "db" : "assets"

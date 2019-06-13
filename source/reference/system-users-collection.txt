@@ -39,7 +39,7 @@ schema:
               { role: "<role name>", db: "<database>" },
               ...
             ],
-     customData: <custom information>,
+     customData: <custom information>
     }
 
 Each ``system.users`` document has the following fields:
