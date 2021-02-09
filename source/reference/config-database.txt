@@ -532,4 +532,5 @@ instance.
 
    .. warning::
 
-      Do not manually modify or drop the ``transactions`` collection.
+      Manually modifying or dropping the ``transactions`` collection
+      will result in an error when using a transaction or a session.
