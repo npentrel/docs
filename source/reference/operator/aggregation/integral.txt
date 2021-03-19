@@ -1,0 +1,156 @@
+=======================
+$integral (aggregation)
+=======================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Definition
+----------
+
+.. versionadded:: 5.0
+
+.. group:: $integral
+
+Returns an approximation for the mathematical integral value, which is
+calculated using the trapezoidal rule with each set of adjacent
+documents forming a trapezoid using the:
+
+- :ref:`sortBy <setWindowFields-sortBy>` field values in the
+  :pipeline:`$setWindowFields` stage for the x axis values.
+
+- :ref:`input <integral-input>` field :ref:`expression
+  <aggregation-expressions>` result values in :group:`$integral` for the
+  y axis values.
+
+:group:`$integral` is only available in the
+:pipeline:`$setWindowFields` stage.
+
+:group:`$integral` syntax:
+
+.. code-block:: none
+   :copyable: false
+
+   {
+      $integral: {
+         input: <expression>,
+         outputUnit: <time unit>
+      }
+   } 
+
+:group:`$integral` takes a document with these fields:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 85
+
+   * - Field
+     - Description
+
+   * - :ref:`input <integral-input>`
+
+     - .. _integral-input:
+     
+       Specifies the :ref:`expression <aggregation-expressions>` to
+       evaluate. You must provide an expression that returns a number.
+
+   * - :ref:`outputUnit <integral-outputUnit>`
+
+     - .. _integral-outputUnit:
+       
+       A ``string`` that specifies the time unit. Use one of these
+       strings:
+
+       - ``"year"``
+
+       - ``"quarter"``
+
+       - ``"month"``
+
+       - ``"week"``
+
+       .. include:: /includes/outputUnit-behavior.rst
+
+Behavior
+--------
+
+If you omit a :ref:`window <setWindowFields-window>`, a default
+window with unbounded upper and lower limits is used.
+
+Example
+-------
+
+.. include:: /includes/setWindowFields-example-collection.rst
+
+This example uses :group:`$integral` in the
+:pipeline:`$setWindowFields` stage to output the integral value for
+the ``quantity`` of cake sales for each ``state``:
+
+.. code-block:: javascript
+
+   db.cakeSales.aggregate( [
+      {
+         $setWindowFields: {
+            partitionBy: "$state",
+            sortBy: { orderDate: 1 },
+            output: {
+               integralForState: {
+                  $integral: {
+                     input: "$quantity",
+                     outputUnit: "week"
+                  },
+                  window: {
+                     documents: [ "unbounded", "current" ]
+                  }
+               }
+            }
+         }
+      }
+   ] )
+
+In the example:
+
+.. include:: /includes/setWindowFields-partition-sort-date.rst
+
+- ``output`` sets the ``quantity`` integral value in a new
+  field called ``integralForState`` using
+  :group:`$integral` that is run in a :ref:`documents
+  <setWindowFields-documents>` window.
+
+  - The :ref:`input <integral-input>` expression is set to
+    ``"$quantity"``, which is used for the y axis values in the integral
+    calculation.
+
+  - The :ref:`outputUnit <integral-outputUnit>` is set to ``"week"``
+    for the ``orderDate`` field, which is used for the x axis values in
+    the integral calculation.
+
+  - The :ref:`window <setWindowFields-window>` contains documents
+    between an ``unbounded`` lower limit and the ``current`` document in
+    the output. This means :group:`$integral` returns the ``quantity``
+    integral value for the documents between the beginning of the
+    partition and the current document.
+
+In this example output, the ``quantity`` integral value for ``CA`` and
+``WA`` is shown in the ``integralForState`` field:
+
+.. code-block:: javascript
+   :copyable: false
+
+   { "_id" : 4, "type" : "strawberry", "orderDate" : ISODate("2019-05-18T16:09:01Z"),
+     "state" : "CA", "price" : 41, "quantity" : 162, "integralForState" : 0 }
+   { "_id" : 0, "type" : "chocolate", "orderDate" : ISODate("2020-05-18T14:10:30Z"),
+     "state" : "CA", "price" : 13, "quantity" : 120, "integralForState" : 7370.62789186508 }
+   { "_id" : 2, "type" : "vanilla", "orderDate" : ISODate("2021-01-11T06:31:15Z"),
+     "state" : "CA", "price" : 12, "quantity" : 145, "integralForState" : 11869.591123511906 }
+   { "_id" : 5, "type" : "strawberry", "orderDate" : ISODate("2019-01-08T06:12:03Z"),
+     "state" : "WA", "price" : 43, "quantity" : 134, "integralForState" : 0 }
+   { "_id" : 3, "type" : "vanilla", "orderDate" : ISODate("2020-02-08T13:13:23Z"),
+     "state" : "WA", "price" : 13, "quantity" : 104, "integralForState" : 6736.974074074074 }
+   { "_id" : 1, "type" : "chocolate", "orderDate" : ISODate("2021-03-20T11:30:05Z"),
+     "state" : "WA", "price" : 14, "quantity" : 140, "integralForState" : 13811.723816137566 }

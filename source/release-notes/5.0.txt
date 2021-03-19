@@ -36,6 +36,15 @@ New Aggregation Operators
        called. The new :expression:`$sampleRate` operator is based on
        ``$rand``.
      
+Window Operators
+~~~~~~~~~~~~~~~~
+
+MongoDB 5.0 introduces the :pipeline:`$setWindowFields` pipeline stage,
+allowing you to perform operations on a specified span of documents in a
+collection, known as a *window*. The operation returns the results based
+on the chosen :ref:`window operator <setWindowFields-window-operators>`.
+
+.. include:: /includes/setWindowFields-introduction-examples.rst
 
 General Aggregation Improvements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

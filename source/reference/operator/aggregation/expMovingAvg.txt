@@ -1,0 +1,296 @@
+===========================
+$expMovingAvg (aggregation)
+===========================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Definition
+----------
+
+.. versionadded:: 5.0
+
+.. group:: $expMovingAvg
+
+Returns the exponential moving average of numeric :ref:`expressions
+<aggregation-expressions>` applied to documents in a :ref:`partition
+<setWindowFields-partitionBy>` defined in the
+:pipeline:`$setWindowFields` stage.
+
+:group:`$expMovingAvg` is only available in the
+:pipeline:`$setWindowFields` stage.
+
+:group:`$expMovingAvg` syntax:
+
+.. code-block:: none
+   :copyable: false
+
+   {
+      $expMovingAvg: {
+         input: <input expression>,
+         N: <integer>,
+         alpha: <float>
+      }
+   } 
+
+:group:`$expMovingAvg` takes a document with these fields:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 85
+
+   * - Field
+     - Description
+
+   * - :ref:`input <expMovingAvg-input>`
+
+     - .. _expMovingAvg-input:
+     
+       Specifies the :ref:`expression <aggregation-expressions>` to
+       evaluate. Non-numeric expressions are ignored.
+
+   * - :ref:`N <expMovingAvg-N>`
+
+     - .. _expMovingAvg-N:
+       
+       An ``integer`` that specifies the number of historical documents
+       that have a significant mathematical weight in the exponential
+       moving average calculation, with the most recent documents
+       contributing the most weight.
+       
+       .. include:: /includes/expMovingAvg-N-or-alpha.rst
+
+       The ``N`` value is used in this formula to calculate the current
+       result based on the :ref:`expression <aggregation-expressions>`
+       value from the current document being read and the previous
+       result of the calculation:
+       
+       .. code-block:: none
+          :copyable: false
+
+          current result = current value * ( 2 / ( N + 1 ) ) +
+                           previous result * ( 1 - ( 2 / ( N + 1 ) ) )
+
+   * - :ref:`alpha <expMovingAvg-alpha>`
+
+     - .. _expMovingAvg-alpha:
+     
+       A ``double`` that specifies the exponential decay value to use in
+       the exponential moving average calculation. A higher ``alpha``
+       value assigns a lower mathematical significance to previous
+       results from the calculation.
+       
+       .. include:: /includes/expMovingAvg-N-or-alpha.rst
+
+       The ``alpha`` value is used in this formula to calculate the
+       current result based on the :ref:`expression
+       <aggregation-expressions>` value from the current document being
+       read and the previous result of the calculation:
+       
+       .. code-block:: none
+          :copyable: false
+
+          current result = current value * alpha +
+                           previous result * ( 1 - alpha )
+
+Behavior
+--------
+
+.. include:: /includes/expMovingAvg-N-or-alpha.rst
+
+:group:`$expMovingAvg` ignores non-numeric values, ``null`` values, and
+missing fields.
+
+Examples
+--------
+
+.. include:: /includes/setWindowFields-example-collection.rst
+
+Exponential Moving Average Using ``N``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example uses :group:`$expMovingAvg` in the
+:pipeline:`$setWindowFields` stage to output the exponential moving
+average ``quantity`` of cake sales using :ref:`N <expMovingAvg-N>` set
+to ``2``:
+
+.. code-block:: javascript
+
+   db.cakeSales.aggregate( [
+      {
+         $setWindowFields: {
+            partitionBy: "$state",
+            sortBy: { quantity: -1 },
+            output: {
+               expMovingAvgForState: {
+                  $expMovingAvg: { input: "$quantity", N: 2 }
+               }
+            }
+         }
+      }
+   ] )
+
+In the example:
+
+.. include:: /includes/setWindowFields-partition-sort-quantity.rst
+
+- ``output`` sets the ``quantity`` exponential moving average in a new
+  field called ``expMovingAvgForState`` as shown in the following
+  results. The value for ``expMovingAvgForState`` is set by
+  :group:`$expMovingAvg` using :ref:`N <expMovingAvg-N>` set to ``2`` in
+  the :ref:`exponential moving average formula <expMovingAvg-N>`.
+
+.. code-block:: javascript
+   :copyable: false
+
+   { "_id" : 4, "type" : "strawberry", "orderDate" : ISODate("2019-05-18T16:09:01Z"),
+     "state" : "CA", "price" : 41, "quantity" : 162, "expMovingAvgForState" : 162 }
+   { "_id" : 2, "type" : "vanilla", "orderDate" : ISODate("2021-01-11T06:31:15Z"),
+     "state" : "CA", "price" : 12, "quantity" : 145, "expMovingAvgForState" : 150.66666666666666 }
+   { "_id" : 0, "type" : "chocolate", "orderDate" : ISODate("2020-05-18T14:10:30Z"),
+     "state" : "CA", "price" : 13, "quantity" : 120, "expMovingAvgForState" : 130.22222222222223 }
+   { "_id" : 1, "type" : "chocolate", "orderDate" : ISODate("2021-03-20T11:30:05Z"),
+     "state" : "WA", "price" : 14, "quantity" : 140, "expMovingAvgForState" : 140 }
+   { "_id" : 5, "type" : "strawberry", "orderDate" : ISODate("2019-01-08T06:12:03Z"),
+     "state" : "WA", "price" : 43, "quantity" : 134, "expMovingAvgForState" : 136 }
+   { "_id" : 3, "type" : "vanilla", "orderDate" : ISODate("2020-02-08T13:13:23Z"),
+     "state" : "WA", "price" : 13, "quantity" : 104, "expMovingAvgForState" : 114.66666666666667 }
+
+The following example increases :ref:`N <expMovingAvg-N>` to ``3``:
+
+.. code-block:: javascript
+
+   db.cakeSales.aggregate( [
+      {
+         $setWindowFields: {
+            partitionBy: "$state",
+            sortBy: { quantity: -1 },
+            output: {
+               expMovingAvgForState: {
+                  $expMovingAvg: { input: "$quantity", N: 3 }
+               }
+            }
+         }
+      }
+   ] )
+
+The following output shows that ``expMovingAvgForState`` is higher
+compared to the previous example, except for the first document in each
+partition that is always equal to the ``quantity`` for that document.
+``expMovingAvgForState`` is higher because the higher :ref:`N
+<expMovingAvg-N>` value assigns a greater mathematical significance to
+previous ``expMovingAvgForState`` values in the partition.
+
+.. code-block:: javascript
+   :copyable: false
+
+   { "_id" : 4, "type" : "strawberry", "orderDate" : ISODate("2019-05-18T16:09:01Z"),
+     "state" : "CA", "price" : 41, "quantity" : 162, "expMovingAvgForState" : 162 }
+   { "_id" : 2, "type" : "vanilla", "orderDate" : ISODate("2021-01-11T06:31:15Z"),
+     "state" : "CA", "price" : 12, "quantity" : 145, "expMovingAvgForState" : 153.5 }
+   { "_id" : 0, "type" : "chocolate", "orderDate" : ISODate("2020-05-18T14:10:30Z"),
+     "state" : "CA", "price" : 13, "quantity" : 120, "expMovingAvgForState" : 136.75 }
+   { "_id" : 1, "type" : "chocolate", "orderDate" : ISODate("2021-03-20T11:30:05Z"),
+     "state" : "WA", "price" : 14, "quantity" : 140, "expMovingAvgForState" : 140 }
+   { "_id" : 5, "type" : "strawberry", "orderDate" : ISODate("2019-01-08T06:12:03Z"),
+     "state" : "WA", "price" : 43, "quantity" : 134, "expMovingAvgForState" : 137 }
+   { "_id" : 3, "type" : "vanilla", "orderDate" : ISODate("2020-02-08T13:13:23Z"),
+     "state" : "WA", "price" : 13, "quantity" : 104, "expMovingAvgForState" : 120.5 }
+
+Exponential Moving Average Using ``alpha``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This example uses :group:`$expMovingAvg` in the
+:pipeline:`$setWindowFields` stage to output the exponential moving
+average ``quantity`` of cake sales using :ref:`alpha
+<expMovingAvg-alpha>` set to ``0.75``:
+
+.. code-block:: javascript
+
+   db.cakeSales.aggregate( [
+      {
+         $setWindowFields: {
+            partitionBy: "$state",
+            sortBy: { quantity: -1 },
+            output: {
+               expMovingAvgForState: {
+                  $expMovingAvg: { input: "$quantity", alpha: 0.75 }
+               }
+            }
+         }
+      }
+   ] )
+
+In the example:
+
+.. include:: /includes/setWindowFields-partition-sort-quantity.rst
+
+- ``output`` sets the ``quantity`` exponential moving average in a new
+  field called ``expMovingAvgForState`` as shown in the following
+  results. The value for ``expMovingAvgForState`` is set by
+  :group:`$expMovingAvg` using :ref:`alpha <expMovingAvg-alpha>` set to
+  ``0.75`` in the :ref:`exponential moving average formula
+  <expMovingAvg-alpha>`.
+
+.. code-block:: javascript
+   :copyable: false
+
+   { "_id" : 4, "type" : "strawberry", "orderDate" : ISODate("2019-05-18T16:09:01Z"),
+     "state" : "CA", "price" : 41, "quantity" : 162, "expMovingAvgForState" : 162 }
+   { "_id" : 2, "type" : "vanilla", "orderDate" : ISODate("2021-01-11T06:31:15Z"),
+     "state" : "CA", "price" : 12, "quantity" : 145, "expMovingAvgForState" : 149.25 }
+   { "_id" : 0, "type" : "chocolate", "orderDate" : ISODate("2020-05-18T14:10:30Z"),
+     "state" : "CA", "price" : 13, "quantity" : 120, "expMovingAvgForState" : 127.3125 }
+   { "_id" : 1, "type" : "chocolate", "orderDate" : ISODate("2021-03-20T11:30:05Z"),
+     "state" : "WA", "price" : 14, "quantity" : 140, "expMovingAvgForState" : 140 }
+   { "_id" : 5, "type" : "strawberry", "orderDate" : ISODate("2019-01-08T06:12:03Z"),
+     "state" : "WA", "price" : 43, "quantity" : 134, "expMovingAvgForState" : 135.5 }
+   { "_id" : 3, "type" : "vanilla", "orderDate" : ISODate("2020-02-08T13:13:23Z"),
+     "state" : "WA", "price" : 13, "quantity" : 104, "expMovingAvgForState" : 111.875 }
+
+The following example increases :ref:`alpha <expMovingAvg-alpha>` to
+``0.95``:
+
+.. code-block:: javascript
+
+   db.cakeSales.aggregate( [
+      {
+         $setWindowFields: {
+            partitionBy: "$state",
+            sortBy: { quantity: -1 },
+            output: {
+               expMovingAvgForState: {
+                  $expMovingAvg: { input: "$quantity", alpha: 0.95 }
+               }
+            }
+         }
+      }
+   ] )
+
+The following output shows that ``expMovingAvgForState`` is lower
+compared to the previous example, except for the first document in each
+partition that is always equal to the ``quantity`` for that document.
+``expMovingAvgForState`` is lower because the higher :ref:`alpha
+<expMovingAvg-alpha>` value assigns a lower mathematical significance to
+previous ``expMovingAvgForState`` values in the partition.
+
+.. code-block:: javascript
+   :copyable: false
+
+   { "_id" : 4, "type" : "strawberry", "orderDate" : ISODate("2019-05-18T16:09:01Z"),
+     "state" : "CA", "price" : 41, "quantity" : 162, "expMovingAvgForState" : 162 }
+   { "_id" : 2, "type" : "vanilla", "orderDate" : ISODate("2021-01-11T06:31:15Z"),
+     "state" : "CA", "price" : 12, "quantity" : 145, "expMovingAvgForState" : 145.85 }
+   { "_id" : 0, "type" : "chocolate", "orderDate" : ISODate("2020-05-18T14:10:30Z"),
+     "state" : "CA", "price" : 13, "quantity" : 120, "expMovingAvgForState" : 121.2925 }
+   { "_id" : 1, "type" : "chocolate", "orderDate" : ISODate("2021-03-20T11:30:05Z"),
+     "state" : "WA", "price" : 14, "quantity" : 140, "expMovingAvgForState" : 140 }
+   { "_id" : 5, "type" : "strawberry", "orderDate" : ISODate("2019-01-08T06:12:03Z"),
+     "state" : "WA", "price" : 43, "quantity" : 134, "expMovingAvgForState" : 134.3 }
+   { "_id" : 3, "type" : "vanilla", "orderDate" : ISODate("2020-02-08T13:13:23Z"),
+     "state" : "WA", "price" : 13, "quantity" : 104, "expMovingAvgForState" : 105.515 }

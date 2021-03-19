@@ -1,0 +1,167 @@
+=========================
+$derivative (aggregation)
+=========================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Definition
+----------
+
+.. versionadded:: 5.0
+
+.. group:: $derivative
+
+Returns the mathematical derivative value, which is calculated using
+the:
+
+- First and last documents in the :pipeline:`$setWindowFields` stage
+  :ref:`window <setWindowFields-window>`.
+
+- Numerator, which is set to the result of subtracting the numeric
+  :ref:`expression <aggregation-expressions>` value for the first
+  document from the :ref:`expression <aggregation-expressions>` value
+  for the last document.
+
+- Denominator, which is set to the result of subtracting the
+  :ref:`sortBy <setWindowFields-sortBy>` field value for the first
+  document from the :ref:`sortBy <setWindowFields-sortBy>` field value
+  for last document.
+
+:group:`$derivative` is only available in the
+:pipeline:`$setWindowFields` stage. You must specify a :ref:`window
+<setWindowFields-window>` in the :pipeline:`$setWindowFields` stage when
+using :group:`$derivative`.
+
+:group:`$derivative` syntax:
+
+.. code-block:: none
+   :copyable: false
+
+   {
+      $derivative: {
+         input: <expression>,
+         outputUnit: <time unit>
+      }
+   } 
+
+:group:`$derivative` takes a document with these fields:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 85
+
+   * - Field
+     - Description
+
+   * - :ref:`input <derivative-input>`
+
+     - .. _derivative-input:
+     
+       Specifies the :ref:`expression <aggregation-expressions>` to
+       evaluate. The expression must evaluate to a number.
+
+   * - :ref:`outputUnit <derivative-outputUnit>`
+
+     - .. _derivative-outputUnit:
+       
+       A ``string`` that specifies the time unit. Use one of these
+       strings:
+
+       - ``"week"``
+
+       - ``"day"``
+
+       - ``"hour"``
+
+       - ``"minute"``
+
+       - ``"second"``
+
+       - ``"millisecond"``
+
+       .. include:: /includes/outputUnit-behavior.rst
+
+Behavior
+--------
+
+You must specify a :ref:`window <setWindowFields-window>` in the
+:pipeline:`$setWindowFields` stage when using :group:`$derivative`.
+
+Example
+-------
+
+.. include:: /includes/setWindowFields-example-collection.rst
+
+This example uses :group:`$derivative` in the
+:pipeline:`$setWindowFields` stage to output the derivative value for
+the ``quantity`` of cake sales for each ``state``:
+
+.. code-block:: javascript
+
+   db.cakeSales.aggregate( [
+      {
+         $setWindowFields: {
+            partitionBy: "$state",
+            sortBy: { orderDate: 1 },
+            output: {
+               derivativeForState: {
+                  $derivative: {
+                     input: "$quantity",
+                     outputUnit: "week"
+                  },
+                  window: {
+                     documents: [ -1, "current" ]
+                  }
+               }
+            }
+         }
+      }
+   ] )
+
+In the example:
+
+.. include:: /includes/setWindowFields-partition-sort-date.rst
+
+- ``output`` sets the ``quantity`` derivative value in a new
+  field called ``derivativeForState`` using :group:`$derivative` that is
+  run in a :ref:`documents <setWindowFields-documents>` window.
+
+  - The :ref:`input <derivative-input>` expression is set to
+    ``"$quantity"``, which is used in the numerator for the derivative
+    calculation.
+
+  - The :ref:`outputUnit <derivative-outputUnit>` is set to ``"week"``
+    for the ``orderDate`` field, which is used in the denominator for
+    the derivative calculation.
+
+  - The :ref:`window <setWindowFields-window>` contains documents
+    between lower limit of ``-1`` (the previous document in the output)
+    and the ``current`` document in the output. This means
+    :group:`$derivative` returns the ``quantity`` derivative value for
+    the documents between the previous document and the current document
+    in the output.
+
+In this example output, the ``quantity`` derivative value for ``CA`` and
+``WA`` is shown in the ``derivativeForState`` field:
+
+.. code-block:: javascript
+   :copyable: false
+
+   { "_id" : 4, "type" : "strawberry", "orderDate" : ISODate("2019-05-18T16:09:01Z"),
+     "state" : "CA", "price" : 41, "quantity" : 162, "derivativeForState" : null }
+   { "_id" : 0, "type" : "chocolate", "orderDate" : ISODate("2020-05-18T14:10:30Z"),
+     "state" : "CA", "price" : 13, "quantity" : 120, "derivativeForState" : -0.8034593642335517 }
+   { "_id" : 2, "type" : "vanilla", "orderDate" : ISODate("2021-01-11T06:31:15Z"),
+     "state" : "CA", "price" : 12, "quantity" : 145, "derivativeForState" : 0.7362807450167745 }
+   { "_id" : 5, "type" : "strawberry", "orderDate" : ISODate("2019-01-08T06:12:03Z"),
+     "state" : "WA", "price" : 43, "quantity" : 134, "derivativeForState" : null }
+   { "_id" : 3, "type" : "vanilla", "orderDate" : ISODate("2020-02-08T13:13:23Z"),
+     "state" : "WA", "price" : 13, "quantity" : 104, "derivativeForState" : -0.5299114944999487 }
+   { "_id" : 1, "type" : "chocolate", "orderDate" : ISODate("2021-03-20T11:30:05Z"),
+     "state" : "WA", "price" : 14, "quantity" : 140, "derivativeForState" : 0.6207993441643613 }
