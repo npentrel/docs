@@ -38,6 +38,24 @@ Definition
       - :dbcommand:`count`
       - :method:`db.collection.count()`
 
+Considerations
+--------------
+
+.. _count-memory-limit:
+
+``$count`` and Memory Restrictions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :pipeline:`$count` stage has a limit of 100 megabytes of RAM. By
+default, if the stage exceeds this limit, :pipeline:`$count` returns an
+error. To allow more space for stage processing, use the
+:ref:`allowDiskUse <aggregate-cmd-allowDiskUse>` option to enable
+aggregation pipeline stages to write data to temporary files.
+
+.. seealso::
+
+   :doc:`/core/aggregation-pipeline-limits`
+
 Behavior
 --------
 
