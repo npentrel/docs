@@ -57,7 +57,7 @@ Considerations
 ``$facet`` and Memory Restrictions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :pipeline:`$facet` stage has a limit of 100 megabytes of RAM. By
+The :pipeline:`$facet` stage has a limit of 16 megabytes of RAM. By
 default, if the stage exceeds this limit, :pipeline:`$facet` returns an
 error. To allow more space for stage processing, use the
 :ref:`allowDiskUse <aggregate-cmd-allowDiskUse>` option to enable
