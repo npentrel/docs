@@ -259,6 +259,46 @@ asserts
    value to provide context to the other values in the
    :serverstatus:`asserts` data structure.
 
+.. _server-status-bucketcatalog:
+
+bucketCatalog
+~~~~~~~~~~~~~
+
+.. code-block:: javascript
+
+  "bucketCatalog" : {
+      "numBuckets" : <num>,
+      "numOpenBuckets" : <num>,
+      "numIdleBuckets" : <num>,
+      "memoryUsage" : <num>
+   }
+
+   .. versionadded:: 5.0
+
+.. serverstatus:: numBuckets
+
+   The number of buckets that store time series data internally.
+
+   .. versionadded:: 5.0
+
+.. serverstatus:: numOpenBuckets
+
+   The number of buckets that can store incoming time series data.
+
+   .. versionadded:: 5.0
+
+.. serverstatus:: numIdleBuckets
+
+   The number of buckets that cannot store incoming time series data.
+
+   .. versionadded:: 5.0
+
+.. serverstatus:: memoryUsage
+
+   The number of megabytes used by internal bucketing data structures.
+
+   .. versionadded:: 5.0
+
 .. _server-status-connections:
 
 connections

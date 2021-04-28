@@ -269,3 +269,10 @@ Deprecations
 
 5.0 Feature Compatibility
 -------------------------
+
+Some features in 5.0 require not just the 5.0 binaries but the
+:ref:`featureCompatibilityVersion <view-fcv>` (fCV) set to 5.0. These
+features include:
+
+- Creation of :ref:`time series collections
+  <manual-timeseries-collection>`.
