@@ -1,0 +1,233 @@
+.. _manual-timeseries-collection:
+
+=======================
+Time-series Collections
+=======================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+.. meta::
+   :description: Time-series, IOT
+   :keywords: Time-series, IOT
+
+.. versionadded:: 5.0
+
+:term:`Time-series collections <time-series collection>` efficiently
+store sequences of measurements over a period of time. Compared to
+normal collections, storing time-series data in time-series collections
+reduces disk space and improves query efficiency.
+
+See :method:`~db.createCollection()` or :dbcommand:`create`
+for more information about creating time-series collections.
+
+Procedures
+----------
+
+Enable Time-Series
+~~~~~~~~~~~~~~~~~~
+
+You can only create time-series collections on a fully upgraded system
+with :ref:`featureCompatibilityVersion <view-fcv>` set to 5.0.
+
+Time-series collections are disabled by default. To enable time-series
+collections, start the :binary:`~bin.mongod` using the commandline
+option :option:`--setParameter <mongod --setParameter>` with the
+:parameter:`featureFlagTimeseriesCollection` set to ``true``:
+
+.. code-block:: bash
+
+   mongod --setParameter "featureFlagTimeseriesCollection=true"
+
+Create a Time-Series Collection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You must create time-series collections explicitly using the
+:method:`db.createCollection()` method, which is a helper in the
+:binary:`~bin.mongo` shell for the :dbcommand:`create` command. When
+creating a time-series collection you must specify a ``timeField``.
+MongoDB validates that each document you insert into your time-series
+collection has a valid BSON type date as the value for the specified
+field.
+
+.. code-block:: javascript
+
+   db.createCollection("weather", { timeseries: { timeField: "timestamp" } } )
+
+You may also specify the optional fields ``metaField`` and
+``expireAfterSeconds``. The ``metaField`` is the designated field for
+metadata. The ``expireAfterSeconds`` field enables automatic deletion of
+documents older than the specified number of seconds.
+
+.. code-block:: javascript
+
+   db.createCollection(
+       "weather24h",
+       {
+          timeseries: {
+             timeField: "timestamp",
+             metaField: "metadata",
+             expireAfterSeconds: 86400
+          }
+       }
+   )
+
+Additional options allowed with the ``timeseries`` option
+are:
+
+- ``storageEngine``
+- ``indexOptionDefaults``
+- ``collation``
+- ``writeConcern``
+- ``comment``
+
+.. see::
+
+   :method:`db.createCollection()` and :dbcommand:`create`.
+
+Insert a Measurement
+~~~~~~~~~~~~~~~~~~~~
+
+To insert a single measurement, issue the following command:
+
+.. code-block:: javescript
+
+   db.weather.insert({
+      "metadata": [{"sensorId": 5578}, {"type": "temperature"}],
+      "timestamp": {"$date": "2020-08-28T04:00:00.000Z"},
+      "temp": 26
+   })
+
+To insert multiple measurements, use the
+:method:`db.collection.insertMany()` method.
+
+Query a Time-Series Collection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To retrieve one document from a time-series collection, issue the
+following command:
+
+.. code-block:: javescript
+
+   db.weather.findOne({
+      "timestamp": {"$date": "2021-05-11T04:00:00.000Z"}
+   })
+
+For more complex analysis, you can use the :ref:`aggregation framework
+<aggregation-framework>`:
+
+.. code-block:: javescript
+
+   db.weather.aggregate([
+      {
+         $project: {
+            date: {
+               $dateToParts: { date: "$timestamp" }
+            },
+            temp: 1
+         }
+      },
+      {
+         $group: {
+            _id: {
+               date: {
+                  year: "$date.year",
+                  month: "$date.month",
+                  day: "$date.day"
+               }
+            },
+            avgTmp: { $avg: "$temp" }
+         }
+      }
+   ])
+
+.. _set-up-automatic-removal:
+
+Check if a Collection is of Type Time-Series
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the :method:`~db.collection.stats()` method to determine if a
+collection is timeseries:
+
+.. code-block:: javascript
+
+   db.runCommand( { listCollections: 1.0 } )
+
+If the collection is a time-series collection, it returns this:
+
+.. codeblock:: javascript
+   {
+      cursor: {
+         id: <number>,
+         ns: 'test.$cmd.listCollections',
+         firstBatch: [
+           {
+              name: <string>,
+              type: <string>,
+              options: {
+                 validator: { ... },
+                 clusteredIndex: { ... },
+                 timeseries: { ... }
+              },
+              ...
+           },
+           ...
+         ]
+      }
+   }
+
+Behavior
+--------
+
+Time-series collections behave like normal collections. You can insert
+and query your data as you normally would. Behind the scenes, a
+time-series collection operates as a writable non-materialized view on
+an internal collection that stores bucketed time-series data.
+
+When you issue queries to time-series collections, you operate on one
+document per measurement. MongoDB takes unpacks the data before
+returning results to your queries.
+
+Index
+~~~~~
+
+The implementation of time-series collections uses buckets to reduce
+disk space and improve query efficiency. The data in your time-series
+collection is indexed per bucket on the field specified as the
+``timeField``.
+
+If you create a collection for weather data with
+``{ timeField: timestamp }``, MongoDB automatically creates an index on
+the ``timestamp`` field (``{ timestamp: 1 }``).
+
+.. tip::
+
+   You can manually :ref:`add secondary indexes
+   <add-secondary-indexes>` on the field specified as the ``metaField``.
+
+.. seealso::
+
+   - :ref:`Time-series Collection Limitations
+     <_manual-timeseries-collection-limitations>`
+   - :ref:`Set up Automatic Removal (TTL)
+     <_manual-timeseries-automatic-removal>`
+   - :ref:`Add Secondary Indexes on metaField and timeField
+     <_timeseries-add-secondary-index>`
+   - :ref:`<Build Materialized Views on Top of Time-Series Data
+     _manual-timeseries-collection-materialized-views>`
+   - :ref:`Migrate data into a Time-Series Collection
+     <_migrate-data-into-a-timeseries-collection>`
+
+.. toctree::
+   :titlesonly:
+
+   /core/timeseries/timeseries-limitations
+   /core/timeseries/timeseries-automatic-removal
+   /core/timeseries/timeseries-secondary-index
+   /core/timeseries/timeseries-migrate-data-into-timeseries-collection
+   /core/timeseries/timeseries-build-materialized-views

@@ -150,6 +150,12 @@ Capped Collections
 
 .. include:: /includes/fact-remove-capped-collection-restriction.rst
 
+Time-series Collections
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You cannot use the :method:`~db.collection.remove()` method with a
+:term:`time-series collection`.
+
 Sharded Collections
 ~~~~~~~~~~~~~~~~~~~
 

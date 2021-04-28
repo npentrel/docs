@@ -1,0 +1,99 @@
+.. _manual-timeseries-automatic-removal:
+
+==============================
+Set up Automatic Removal (TTL)
+==============================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+.. meta::
+   :description: Time-series, IOT
+   :keywords: Time-series, IOT
+
+The ``expireAfterSeconds`` field enables automatic deletion of
+documents older than the specified number of seconds.
+
+You can set up automatic removal of documents older than a specified
+number of seconds by using the ``expireAfterSeconds``parameter when you
+create the collection. The expiration threshold is the timeField field
+value plus the specified number of seconds. If you want to set up
+automatic removal for an existing collection issue the following
+command:
+
+.. code-block:: javascript
+
+   db.runCommand({
+      collMod: "weather24h",
+      clusteredIndex: { expireAfterSeconds: 604800 }
+   })
+
+Change the expireAfterSeconds parameter
+---------------------------------------
+
+To change the time after which data is automatically deleted, issue the
+following command:
+
+.. code-block:: javascript
+
+   db.runCommand({
+      collMod: "weather24h",
+      clusteredIndex: { expireAfterSeconds: 604801 }
+   })
+
+To see the current value of ``expireAfterSeconds``, issue the following
+command:
+
+.. code-block:: javascript
+
+   db.runCommand( { listCollections: 1.0 } )
+
+You can find the current value of ``expireAfterSeconds`` inside the
+document for the ``system.buckets.weather24h`` collection under the
+``options.clusteredIndex`` field.
+
+.. codeblock:: javascript
+   {
+      cursor: {
+         id: 0,
+         ns: 'test.$cmd.listCollections',
+         firstBatch: [
+           {
+              name: 'system.buckets.weather24h',
+              type: 'collection',
+              options: {
+                 validator: { ... },
+                 clusteredIndex: { expireAfterSeconds: 86401 },
+                 timeseries: { ... }
+              },
+              ...
+           },
+           ...
+         ]
+      }
+   }
+
+Behavior
+--------
+
+Timing of the Delete Operations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MongoDB does not guarantee that expired data will be deleted immediately
+upon expiration. There may be a delay between the time a document
+expires and the time that MongoDB removes the document from the
+database.
+
+The background task that removes expired documents runs every 60
+seconds. As a result, documents may remain in a collection during the
+period between the expiration of the document and the running of the
+background task.
+
+Because the duration of the removal operation depends on the workload of
+your mongod instance, expired data may exist for some time beyond the 60
+second period between runs of the background task.

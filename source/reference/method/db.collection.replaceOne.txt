@@ -173,6 +173,14 @@ Capped Collections
 
 .. include:: /includes/extracts/capped-collection-immutable-document-size-replace.rst
 
+.. _replaceOne-timeseries-collection:
+
+Time-series Collections
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You cannot use the :method:`~db.collection.replaceOne()` method with a
+:term:`time-series collection`.
+
 .. _replaceOne-sharded-collection:
 
 Sharded Collections

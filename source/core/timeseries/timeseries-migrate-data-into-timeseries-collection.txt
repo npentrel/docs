@@ -1,0 +1,31 @@
+.. _migrate-data-into-a-timeseries-collection:
+
+==========================================
+Migrate data into a Time-Series Collection
+==========================================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+.. meta::
+   :description: Time-series, IOT
+   :keywords: Time-series, IOT
+
+tbd
+
+.. PLEASE IGNORE FOR NOW
+.. Migration of existing data into time-series collection
+
+.. To migrate existing data to time-series collection, a user would have to
+.. create a new time-series collection, transform existing data into
+.. bucketed representation and load directly into the corresponding bucket
+.. collection. For moving from existing bucket collection to new bucket
+.. collection users have the following options:
+.. mongodump/mongorestore of the bucket collection
+.. Aggregation on source bucket collection with $out to destination bucket
+.. collection

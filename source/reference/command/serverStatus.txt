@@ -18,6 +18,8 @@ serverStatus
 Definition
 ----------
 
+.. versionadded:: 5.0
+
 .. dbcommand:: serverStatus
 
    The :dbcommand:`serverStatus` command returns a document that
@@ -258,6 +260,36 @@ asserts
    rollover to zero after 2\ :superscript:`30` assertions. Use this
    value to provide context to the other values in the
    :serverstatus:`asserts` data structure.
+
+.. _server-status-bucketcatalog:
+
+bucketCatalog
+~~~~~~~~~~~~~
+
+.. code-block:: javascript
+
+  "bucketCatalog" : {
+      "numBuckets" : <num>,
+      "numOpenBuckets" : <num>,
+      "numIdleBuckets" : <num>,
+      "memoryUsage" : <num>
+   }
+
+.. serverstatus:: numBuckets
+
+   The number of buckets that store time-series data internally.
+
+.. serverstatus:: numOpenBuckets
+
+   The number of buckets that can store incoming time-series data.
+
+.. serverstatus:: numIdleBuckets
+
+   The number of buckets that ??.
+
+.. serverstatus:: memoryUsage
+
+   The number of megabytes used for ???.
 
 .. _server-status-connections:
 

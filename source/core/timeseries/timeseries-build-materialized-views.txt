@@ -1,0 +1,32 @@
+.. _manual-timeseries-collection-materialized-views:
+
+===================================================
+Build Materialized Views on Top of Time-Series Data
+===================================================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+.. meta::
+   :description: Time-series, IOT
+   :keywords: Time-series, IOT
+
+tbd
+
+.. PLEASE IGNORE FOR NOW
+.. Users will be able to build materialized views in v1 via $merge or $out commands as they would for other collections.
+.. Users will not be able to natively schedule the refreshing of these materialized views.
+.. Users will need to run their own cron jobs or manually refresh these views
+.. Materialized views will be used for archiving, different data access pattern management and analytics use cases
+
+.. For example:
+.. Aggregate sales for 5 minute windows
+.. Create a view for the data science team to run analysis on
+.. Archive all data older than 5 minutes
+.. Users will not have access to “real-time” analytics in v1
+
