@@ -1,0 +1,34 @@
+.. _timeseries-add-secondary-index:
+
+================================================
+Add Secondary Indexes on metaField and timeField
+================================================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+.. meta::
+   :description: Time series, IOT
+   :keywords: Time series, IOT
+
+To improve query performance for time series collections, add :term:`secondary
+indexes <secondary index>` that cover common query patterns.
+
+For example:
+
+.. code-block:: javascript
+
+   db.weather24h.createIndex({ "metadata.sensorId": 1, "timestamp": 1 })
+
+The preceeding command will create a :ref:`compound index
+<index-type-compound>` on the ``metadata.sensorID`` and ``timestamp``
+fields.
+
+.. see::
+
+   :method:`db.collection.createIndex()`.
