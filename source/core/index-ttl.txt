@@ -105,8 +105,9 @@ Restrictions
 - The ``_id`` field does not support TTL indexes.
 
 - You cannot create a TTL index on a :doc:`capped collection
-  </core/capped-collections>` because MongoDB cannot remove documents
-  from a capped collection.
+  </core/capped-collections>` or a :doc:`time series collection
+  </core/timeseries-collections>` because MongoDB cannot perform delete
+  operations on these collections.
 
 - You cannot use :method:`~db.collection.createIndex()` to change the
   value of ``expireAfterSeconds`` of an existing index. Instead use the
