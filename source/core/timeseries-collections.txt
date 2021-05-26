@@ -26,6 +26,8 @@ reduces disk space and improves query efficiency.
 Procedures
 ----------
 
+.. _manual-timeseries-collection-create:
+
 Create a Time Series Collection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
