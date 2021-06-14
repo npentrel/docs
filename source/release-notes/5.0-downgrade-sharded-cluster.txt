@@ -34,10 +34,15 @@ Prerequisites
 
 To downgrade from |newversion| to |oldversion|, you must remove
 incompatible features that are persisted and/or update incompatible
-configuration settings. 
+configuration settings.
+
+.. note::
+
+   If you started a :ref:`resharding operation <sharding-resharding>`,
+   you need to wait for it to complete before you can downgrade.
 
 .. |target| replace:: :binary:`~bin.mongos` instance
-  
+
 .. _5.0-downgrade-feature-compatibility-sharded-cluster:
 
 1. Downgrade Feature Compatibility Version (fCV)

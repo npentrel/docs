@@ -42,6 +42,11 @@ To downgrade from |newversion| to |oldversion|, you must remove
 incompatible features that are persisted and/or update incompatible
 configuration settings.
 
+.. note::
+
+   If you started a :ref:`resharding operation <sharding-resharding>`,
+   you need to wait for it to complete before you can downgrade.
+
 .. |target| replace:: primary
 
 .. _5.0-downgrade-feature-compatibility-rs:

@@ -33,13 +33,18 @@ Access Control
 If your deployment has access control enabled, your downgrade user
 privileges must include privileges to list and manage indexes across
 databases. A user with :authrole:`root` role has the required privileges.
-      
+
 Prerequisites
 -------------
 
 To downgrade from |newversion| to |oldversion|, you must remove
 incompatible features that are persisted and/or update incompatible
 configuration settings. These include:
+
+.. note::
+
+   If you started a :ref:`resharding operation <sharding-resharding>`,
+   you need to wait for it to complete before you can downgrade.
 
 .. |target| replace:: :binary:`~bin.mongod` instance
 

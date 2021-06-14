@@ -37,7 +37,7 @@ Downgrade Feature Compatibility Version (fCV)
 ---------------------------------------------
 
 Before downgrading the binaries, you must downgrade the
-``featureCompatibilityVersion`` (fCV) to |oldfcv|. 
+``featureCompatibilityVersion`` (fCV) to |oldfcv|.
 
 .. _5.0-downgrade-features-prereq:
 

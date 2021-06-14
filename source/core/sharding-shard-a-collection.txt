@@ -71,7 +71,10 @@ For details on updating the shard key value, see
 Change Shard Key
 ~~~~~~~~~~~~~~~~
 
-Starting in MongoDB 5.0, you can update a document's shard key. In
-MongoDB 4.4 and earlier, a document's shard key is immutable.
+Starting in MongoDB 5.0, you can change a document's shard key by
+:ref:`resharding a collection <sharding-resharding>`.
 
-For details on updating the shard key, see :ref:`change-shard-key`.
+Starting in MongoDB 4.4, you can add a suffix to a document's shard key
+by :ref:`refining a shard key <shard-key-refine>`.
+
+In MongoDB 4.2 and earlier, a document's shard key is immutable.
