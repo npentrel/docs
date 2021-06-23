@@ -27,7 +27,7 @@ a :binary:`~bin.mongos`:
    * - | :ref:`update <command-update-shard-key-modification>` with
        | ``multi: true``
 
-     - | :method:`db.collection.updateMany() <updateMany-sharded-collection>`
+     - | :ref:`db.collection.updateMany() <updateMany-sharded-collection>`
 
      - - Can be used to set the missing key value to ``null`` only.
 
