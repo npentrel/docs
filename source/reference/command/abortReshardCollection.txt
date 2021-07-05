@@ -19,7 +19,7 @@ Definition
 
    During a :ref:`resharding operation <sharding-resharding>`, you can
    abort the operation with the :dbcommand:`abortReshardCollection`
-   command:
+   command.
 
    The command has the following syntax:
 
@@ -32,9 +32,12 @@ Definition
    You can abort a :ref:`resharding operation <sharding-resharding>` at
    any point until the :ref:`commit phase <resharding-commit-phase>`. If
    the :ref:`resharding operation <sharding-resharding>` has reached the
-   :ref:`commit phase <resharding-commit-phase>` before you run the
+   :ref:`commit phase <resharding-commit-phase-command>` before you run the
    :dbcommand:`abortReshardCollection` command, the command returns an
    error.
+
+   The :mongosh:`MongoDB Shell </>` provides a wrapper method
+   :method:`sh.abortReshardCollection()`.
 
 Example
 -------
