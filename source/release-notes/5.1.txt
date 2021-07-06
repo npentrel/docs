@@ -1,0 +1,65 @@
+=============================
+Release Notes for MongoDB 5.1
+=============================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: twocols
+
+
+.. _5.0-rel-notes-general:
+
+General Improvements
+--------------------
+
+Convert a non-TTL single-field Index into a TTL Index
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Starting in MongoDB 5.1, you can use the :dbcommand:`collMod` database
+command to add the ``expireAfterSeconds`` option to an existing
+single-field non-TTL index.
+
+.. _5.1-upgrade:
+
+Upgrade Procedures
+------------------
+
+.. _5.1-download:
+
+Download
+--------
+
+To download MongoDB 5.1, go to the `MongoDB Download Center
+<https://www.mongodb.com/try/download?tck=docs_server>`_.
+
+.. seealso::
+
+   - `All Third Party License Notices <https://github.com/mongodb/mongo/blob/v4.4/distsrc/THIRD-PARTY-NOTICES>`_.
+
+.. _5.1-known-issues:
+
+Known Issues
+------------
+
+Report an Issue
+---------------
+
+To report an issue, see
+https://github.com/mongodb/mongo/wiki/Submit-Bug-Reports for
+instructions on how to file a JIRA ticket for the MongoDB server or one
+of the related projects.
+
+.. class:: hidden
+
+   .. toctree::
+
+      /release-notes/5.1-compatibility
+      /release-notes/5.0-upgrade-standalone
+      /release-notes/5.0-upgrade-replica-set
+      /release-notes/5.0-upgrade-sharded-cluster
+      /release-notes/5.0-downgrade
+      /release-notes/5.1-changelog
